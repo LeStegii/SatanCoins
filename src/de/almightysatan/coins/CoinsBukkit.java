@@ -2,9 +2,13 @@ package de.almightysatan.coins;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -39,7 +43,6 @@ public class CoinsBukkit extends JavaPlugin implements Listener {
 			yamlConfiguration.set("mysql.user", "db-user");
 			yamlConfiguration.set("mysql.pw", "db-password");
 			yamlConfiguration.save(configFile);
-			return;
 		}else
 			yamlConfiguration = YamlConfiguration.loadConfiguration(configFile);
 
@@ -48,6 +51,31 @@ public class CoinsBukkit extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent e) {
-		Coins.loadBalance(e.getUniqueId());
+		Coins.loadPlayer(e.getUniqueId());
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if(sender instanceof Player)
+			new CoinsCommand(new CoinsPlayer() {
+				
+				@Override
+				public void sendMessage(String message) {
+					sender.sendMessage(message);
+				}
+				
+				@Override
+				public boolean hasPermission(String permission) {
+					return sender.hasPermission(permission);
+				}
+				
+				@Override
+				public UUID getUUID() {
+					return ((Player) sender).getUniqueId();
+				}
+			}, args);
+		else
+			sender.sendMessage(Coins.PREFIX + "§cDieser Befehl ist nur für Spieler!");
+		return true;
 	}
 }
