@@ -53,29 +53,32 @@ public class CoinsBukkit extends JavaPlugin implements Listener {
 	public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent e) {
 		Coins.loadPlayer(e.getUniqueId());
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(sender instanceof Player)
-			new CoinsCommand(new CoinsPlayer() {
-				
-				@Override
-				public void sendMessage(String message) {
-					sender.sendMessage(message);
-				}
-				
-				@Override
-				public boolean hasPermission(String permission) {
-					return sender.hasPermission(permission);
-				}
-				
-				@Override
-				public UUID getUUID() {
-					return ((Player) sender).getUniqueId();
-				}
-			}, args);
-		else
-			sender.sendMessage(Coins.PREFIX + "§cDieser Befehl ist nur für Spieler!");
+		new CoinsCommand(new CoinsCommandSender() {
+
+			@Override
+			public boolean isPlayer() {
+				return sender instanceof Player;
+			}
+
+			@Override
+			public UUID getUUID() {
+				return ((Player) sender).getUniqueId();
+			}
+
+			@Override
+			public void sendMessage(String message) {
+				sender.sendMessage(message);
+			}
+
+			@Override
+			public boolean hasPermission(String permission) {
+				return sender.hasPermission(permission);
+			}
+		}, args);
+		
 		return true;
 	}
 }

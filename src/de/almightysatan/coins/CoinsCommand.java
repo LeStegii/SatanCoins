@@ -12,17 +12,20 @@ public class CoinsCommand {
 	
 	static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 
-	CoinsCommand(CoinsPlayer sender, String[] args) {
+	CoinsCommand(CoinsCommandSender sender, String[] args) {
 		if(args.length == 1)
-			getUUID(args[0], (uuid) -> {
+			getUUID(args[0], uuid -> {
 				if(uuid == null)
 					sendInvalidPlayer(sender);
 				else
 					Coins.getOfflineCoins(uuid, (balance) -> sender.sendMessage(Coins.PREFIX + args[0] + " hat §e" + balance + " §7coins"));
 			});
-		else if(args.length == 0 || !sender.hasPermission("coins.admin"))
-			sender.sendMessage(Coins.PREFIX + "Du hast §e" + Coins.getCoins(sender.getUUID()) + " §7coins");
-		else if(args.length == 3) {
+		else if(args.length == 0 || !sender.hasPermission("coins.admin")) {
+			if(sender.isPlayer())
+				sender.sendMessage(Coins.PREFIX + "Du hast §e" + Coins.getCoins(sender.getUUID()) + " §7coins");
+			else
+				sendUsage(sender);
+		}else if(args.length == 3) {
 			final int amount;
 			
 			try {
@@ -32,7 +35,7 @@ public class CoinsCommand {
 				return;
 			}
 			
-			getUUID(args[0], (uuid) -> {
+			getUUID(args[0], uuid -> {
 				if(uuid == null)
 					sendInvalidPlayer(sender);
 				else
@@ -78,11 +81,11 @@ public class CoinsCommand {
 		});
 	}
 	
-	private void sendInvalidPlayer(CoinsPlayer sender) {
+	private void sendInvalidPlayer(CoinsCommandSender sender) {
 		sender.sendMessage(Coins.PREFIX + "Dieser Spieler existiert nicht");
 	}
 	
-	private void sendUsage(CoinsPlayer sender) {
+	private void sendUsage(CoinsCommandSender sender) {
 		sender.sendMessage(Coins.PREFIX + "Bitte nutze §e/coins <name> <add/remove/set> <amount> §7oder §e/coins <name>");
 	}
 }
