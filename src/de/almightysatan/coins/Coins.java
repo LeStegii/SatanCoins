@@ -16,7 +16,7 @@ public class Coins {
 
 	static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 	private static Mysql sql;
-	private static Map<UUID, Integer> balance = new HashMap<>();
+	private static Map<UUID, Integer> players = new HashMap<>();
 	static List<CoinsChangeListener> listeners = new ArrayList<>();
 
 	static void init(String url, String user, String password) {
@@ -29,15 +29,15 @@ public class Coins {
 
 	static void loadPlayer(UUID uuid) {
 		try {
-			balance.put(uuid, sql.getCoins(uuid));
+			players.put(uuid, sql.getCoins(uuid));
 		} catch(SQLException e) {
 			throw new Error("Unable to load coins for uuid " + uuid, e);
 		}
 	}
 
 	public static void getOfflineCoins(UUID uuid, Consumer<Integer> callback) {
-		if(balance.containsKey(uuid))
-			callback.accept(balance.get(uuid));
+		if(players.containsKey(uuid))
+			callback.accept(players.get(uuid));
 		else
 			EXECUTOR.execute(() -> {
 				try {
@@ -49,12 +49,12 @@ public class Coins {
 	}
 
 	public static int getCoins(UUID uuid) {
-		return balance.get(uuid);
+		return players.get(uuid);
 	}
 
 	public static void setCoins(UUID uuid, int amount) {
-		if(balance.containsKey(uuid))
-			balance.put(uuid, amount);
+		if(players.containsKey(uuid))
+			players.put(uuid, amount);
 
 		EXECUTOR.execute(() -> {
 			try {
@@ -66,8 +66,8 @@ public class Coins {
 	}
 
 	public static void addCoins(UUID uuid, int amount) {
-		if(balance.containsKey(uuid))
-			balance.put(uuid, balance.get(uuid) + amount);
+		if(players.containsKey(uuid))
+			players.put(uuid, players.get(uuid) + amount);
 
 		EXECUTOR.execute(() -> {
 			try {
