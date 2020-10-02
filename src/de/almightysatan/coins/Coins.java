@@ -1,11 +1,11 @@
 package de.almightysatan.coins;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Vector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -17,7 +17,7 @@ public class Coins {
 	static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 	private static Mysql sql;
 	private static Map<UUID, Integer> players = new HashMap<>();
-	static List<CoinsChangeListener> listeners = new ArrayList<>();
+	private static List<CoinsChangeListener> listeners = new Vector<>();
 
 	static void init(String url, String user, String password) {
 		try {
@@ -33,6 +33,10 @@ public class Coins {
 		} catch(SQLException e) {
 			throw new Error("Unable to load coins for uuid " + uuid, e);
 		}
+	}
+	
+	static void callEvents(UUID uuid, int oldBalance, int newBalance) {
+		listeners.forEach(listener -> listener.onCoinsChange(uuid, oldBalance, newBalance));
 	}
 
 	public static void getOfflineCoins(UUID uuid, Consumer<Integer> callback) {
