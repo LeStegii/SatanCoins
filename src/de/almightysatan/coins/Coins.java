@@ -1,7 +1,9 @@
 package de.almightysatan.coins;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -15,6 +17,7 @@ public class Coins {
 	static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 	private static Mysql sql;
 	private static Map<UUID, Integer> balance = new HashMap<>();
+	static List<CoinsChangeListener> listeners = new ArrayList<>();
 
 	static void init(String url, String user, String password) {
 		try {
@@ -77,5 +80,19 @@ public class Coins {
 
 	public static void removeCoins(UUID uuid, int amount) {
 		addCoins(uuid, -amount);
+	}
+	
+	public static void registerListener(CoinsChangeListener listener) {
+		if(listener == null)
+			throw new NullPointerException();
+		
+		listeners.add(listener);
+	}
+	
+	public static void unregisterListener(CoinsChangeListener listener) {
+		if(listener == null)
+			throw new NullPointerException();
+		
+		listeners.remove(listener);
 	}
 }
