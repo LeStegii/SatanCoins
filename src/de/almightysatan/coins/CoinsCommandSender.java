@@ -2,7 +2,7 @@ package de.almightysatan.coins;
 
 import java.util.UUID;
 
-public interface CoinsCommandSender {
+interface CoinsCommandSender {
 
 	boolean isPlayer();
 	UUID getUUID();
