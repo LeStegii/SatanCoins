@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class Coins {
 
-	static final String PREFIX = "§7[§eCoins§7] ";
+	static final String PREFIX = "§6Coins §8» §7";
 
 	static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 	private static Mysql sql;
